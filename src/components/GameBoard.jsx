@@ -2,7 +2,10 @@ import React, { useState } from 'react';
 
 const GameBoard = () => {
   const gridSize = 10; // For a 10x10 grid
-  const [board, setBoard] = useState(Array(gridSize).fill(Array(gridSize).fill(null))); // Board with null initially
+  const [board, setBoard] = useState(
+    Array.from({ length: gridSize }, () => Array(gridSize).fill(null))
+  );
+  
 
   // Render each square of the board
   const renderSquare = (row, col) => {
