@@ -1,14 +1,13 @@
-export default App;
-import React from 'react';
-import GameBoard from './components/GameBoard';
+import React from "react";
+import GameBoard from "./components/GameBoard";
 
-const App = () => {
+function App() {
   return (
-    <div className="App">
-      <h1>Welcome to Battleship</h1>
+    <div>
+      <h1>Battleship Game</h1>
       <GameBoard />
     </div>
   );
-};
+}
 
 export default App;

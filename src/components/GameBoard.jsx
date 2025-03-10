@@ -1,28 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import "../styles/GameBoard.css"; 
 
 const GameBoard = () => {
-  const gridSize = 10; // For a 10x10 grid
+  const gridSize = 10; // 10x10 grid
   const [board, setBoard] = useState(
-    Array.from({ length: gridSize }, () => Array(gridSize).fill(null))
+    Array(gridSize)
+      .fill(null)
+      .map(() => Array(gridSize).fill(null))
   );
-  
 
-  // Render each square of the board
+  // Function to handle clicks on a square (for ship placement or attacks)
+  const handleSquareClick = (row, col) => {
+    console.log(`Clicked on row: ${row}, col: ${col}`);
+    // Future logic for placing ships or attacking
+  };
+
+  // Function to render each square
   const renderSquare = (row, col) => {
     return (
       <div
         key={`${row}-${col}`}
         className="square"
-        style={{
-          width: '30px',
-          height: '30px',
-          border: '1px solid #ccc',
-          backgroundColor: board[row][col] ? 'gray' : 'white',
-        }}
+        onClick={() => handleSquareClick(row, col)}
       />
     );
   };
 
+  // Function to render the entire board
   const renderBoard = () => {
     let squares = [];
     for (let row = 0; row < gridSize; row++) {
@@ -34,10 +38,8 @@ const GameBoard = () => {
   };
 
   return (
-    <div>
-      <div className="game-board" style={{ display: 'grid', gridTemplateColumns: `repeat(${gridSize}, 30px)` }}>
-        {renderBoard()}
-      </div>
+    <div className="game-board">
+      {renderBoard()}
     </div>
   );
 };

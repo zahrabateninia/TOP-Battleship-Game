@@ -19,12 +19,11 @@
     "eject": "react-scripts eject"
   },
   "jest": {
-  "testMatch": [
-    "**/__tests__/**/*.test.js",
-    "**/__tests__/**/*.spec.js"
-  ]
+    "testMatch": [
+      "**/__tests__/**/*.test.js",
+      "**/__tests__/**/*.spec.js"
+    ]
   },
-
   "eslintConfig": {
     "extends": [
       "react-app",
