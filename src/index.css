@@ -5,9 +5,22 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  padding: 0;
+  display: flex;
+  justify-content: center; 
+  align-items: center; 
+  height: 100vh; 
+  background-color: #f0f0f0; 
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+#root {
+  display: flex;
+  flex-direction: column; /* Stacks header & game board */
+  align-items: center; /* Centers children horizontally */
+  width: 100%;
 }
