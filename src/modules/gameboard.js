@@ -1,5 +1,6 @@
-const Ship= require('./ship');
+// this module manages ship placement, attacks, and game state. 
 
+const Ship= require('./ship');
 class Gameboard {
   constructor() {
     this.ships = [];

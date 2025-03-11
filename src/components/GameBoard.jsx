@@ -1,84 +1,87 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import Player from '../modules/player.js';
+import Gameboard from '../modules/gameboard.js';
 import '../styles/GameBoard.css';
 
-
-const ships = [
-  { name: 'Destroyer', size: 2 },
-  { name: 'Submarine', size: 3 },
-  { name: 'Battleship', size: 4 },
-  { name: 'Carrier', size: 5 },
-];
+const gridSize = 10;
 
 const GameBoard = () => {
-  const gridSize = 10; // 10x10 grid
-  const [board, setBoard] = useState(Array(gridSize).fill(null).map(() => Array(gridSize).fill(null)));
-  const [selectedShip, setSelectedShip] = useState(ships[0]); // Default to first ship
-  const [isHorizontal, setIsHorizontal] = useState(true); // Track ship orientation
-  const [placedShips, setPlacedShips] = useState([]); // Track placed ships
+  const [player] = useState(new Player(false));
+  const [computer] = useState(new Player(true));
+  const [playerBoard, setPlayerBoard] = useState(new Gameboard());
+  const [computerBoard, setComputerBoard] = useState(new Gameboard());
+  const [isPlayerTurn, setIsPlayerTurn] = useState(true);
+  const [gameStatus, setGameStatus] = useState("Game in progress...");
 
-  const isValidPlacement = (row, col, size) => {
-    if (isHorizontal) {
-      if (col + size > gridSize) return false; // Out of bounds
-      for (let i = 0; i < size; i++) {
-        if (board[row][col + i]) return false; // Overlapping check
-      }
-    } else {
-      if (row + size > gridSize) return false; // Out of bounds
-      for (let i = 0; i < size; i++) {
-        if (board[row + i][col]) return false; // Overlapping check
-      }
+  // Computer attacks after the player's turn
+  useEffect(() => {
+    if (!isPlayerTurn) {
+      setTimeout(() => {
+        const result = computer.computerAttack(playerBoard);
+        setPlayerBoard({ ...playerBoard });
+
+        if (result.includes("Game Over")) {
+          setGameStatus(result);
+        } else {
+          setIsPlayerTurn(true);
+        }
+      }, 1000);
     }
-    return true;
+  }, [isPlayerTurn]);
+
+  const handleAttack = (row, col) => {
+    if (!isPlayerTurn || gameStatus !== "Game in progress...") return;
+
+    const result = player.attack([row, col], computerBoard);
+    if (result.includes("You won")) {
+      setGameStatus(result);
+    } else if (result !== "already attacked") {
+      setComputerBoard({ ...computerBoard });
+      setIsPlayerTurn(false);
+    }
   };
 
-  const placeShip = (row, col) => {
-    if (!selectedShip) return; // No ship selected
+  const renderBoard = (board, isEnemy) => (
+    <div className="game-board" style={{ display: 'grid', gridTemplateColumns: `repeat(${gridSize}, 30px)`, gap: '2px' }}>
+      {Array.from({ length: gridSize }, (_, row) =>
+        Array.from({ length: gridSize }, (_, col) => {
+          const coordStr = `${row},${col}`;
+          const isHit = board.ships.some(ship => ship.hits.has(coordStr));
+          const isMiss = board.missedShots.has(coordStr);
 
-    if (!isValidPlacement(row, col, selectedShip.size)) {
-      alert("Invalid placement!");
-      return;
-    }
-
-    setBoard(prevBoard => {
-      const newBoard = prevBoard.map(row => [...row]); // Create copy
-      for (let i = 0; i < selectedShip.size; i++) {
-        if (isHorizontal) newBoard[row][col + i] = selectedShip.name;
-        else newBoard[row + i][col] = selectedShip.name;
-      }
-      return newBoard;
-    });
-
-    setPlacedShips([...placedShips, selectedShip]); // Add to placed ships
-    setSelectedShip(ships[placedShips.length + 1] || null); // Move to next ship
-  };
-
-  const renderSquare = (row, col) => (
-    <div
-      key={`${row}-${col}`}
-      className="square"
-      onClick={() => placeShip(row, col)}
-      style={{
-        width: '30px',
-        height: '30px',
-        border: '1px solid #ccc',
-        backgroundColor: board[row][col] ? 'gray' : 'white',
-        cursor: 'pointer',
-      }}
-    />
+          return (
+            <div
+              key={coordStr}
+              className="square"
+              onClick={isEnemy ? () => handleAttack(row, col) : undefined}
+              style={{
+                width: '30px',
+                height: '30px',
+                border: '1px solid #ccc',
+                backgroundColor: isHit ? 'red' : isMiss ? 'blue' : 'white',
+                cursor: isEnemy ? 'pointer' : 'default',
+              }}
+            />
+          );
+        })
+      )}
+    </div>
   );
 
   return (
     <div>
-      <h2>Game Board</h2>
-      <p>Selected Ship: {selectedShip ? selectedShip.name : "All ships placed!"}</p>
-      <button onClick={() => setIsHorizontal(!isHorizontal)}>
-        Toggle Orientation ({isHorizontal ? 'Horizontal' : 'Vertical'})
-      </button>
-      <div className="game-board" style={{ display: 'grid', gridTemplateColumns: `repeat(${gridSize}, 30px)`, gap: '2px' }}>
-        {board.flatMap((row, rowIndex) =>
-          row.map((_, colIndex) => renderSquare(rowIndex, colIndex))
-        )}
+      <h2>Battleship Game</h2>
+      <div style={{ display: 'flex', gap: '50px' }}>
+        <div>
+          <h3>Your Board</h3>
+          {renderBoard(playerBoard, false)}
+        </div>
+        <div>
+          <h3>Enemy Board</h3>
+          {renderBoard(computerBoard, true)}
+        </div>
       </div>
+      <p>{gameStatus}</p>
     </div>
   );
 };

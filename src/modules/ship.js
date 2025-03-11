@@ -1,3 +1,5 @@
+// Defines how ships track hits and determine if they are sunk.
+
 class Ship {
     constructor(length, position) {
       this.length = length;

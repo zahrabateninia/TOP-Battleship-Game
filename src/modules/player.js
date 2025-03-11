@@ -1,3 +1,4 @@
+// Controls the player’s attack logic and computer AI attacks.
 class Player {
   constructor(isComputer = false) {
     this.isComputer = isComputer;

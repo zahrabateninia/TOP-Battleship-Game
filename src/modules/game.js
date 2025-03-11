@@ -1,3 +1,5 @@
+// coordinates the full game logic, handling turns and checking for a winner.
+
 const Gameboard = require("./gameboard");
 const Player = require("./player");
 
