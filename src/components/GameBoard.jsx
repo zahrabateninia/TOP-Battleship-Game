@@ -1,89 +1,82 @@
-import React, { useState, useEffect } from 'react';
-import Player from '../modules/player.js';
-import Gameboard from '../modules/gameboard.js';
-import '../styles/GameBoard.css';
+// Displays both player and computer boards.
+// The player attacks the computer's board (computer’s ships are hidden).
+// Manages turns and game logic.
 
-const gridSize = 10;
+import React, { useState, useEffect } from "react";
+import Gameboard from "../modules/gameboard"; 
 
 const GameBoard = () => {
-  const [player] = useState(new Player(false));
-  const [computer] = useState(new Player(true));
-  const [playerBoard, setPlayerBoard] = useState(new Gameboard());
-  const [computerBoard, setComputerBoard] = useState(new Gameboard());
-  const [isPlayerTurn, setIsPlayerTurn] = useState(true);
-  const [gameStatus, setGameStatus] = useState("Game in progress...");
+    const [playerBoard, setPlayerBoard] = useState(new Gameboard());
+    const [computerBoard, setComputerBoard] = useState(new Gameboard());
+    const [playerShipsPlaced, setPlayerShipsPlaced] = useState(0);
+    const [selectedDirection, setSelectedDirection] = useState("horizontal");
+    const [gameStarted, setGameStarted] = useState(false);
 
-  // Computer attacks after the player's turn
-  useEffect(() => {
-    if (!isPlayerTurn) {
-      setTimeout(() => {
-        const result = computer.computerAttack(playerBoard);
-        setPlayerBoard({ ...playerBoard });
+    // Ship lengths in order (example: 5 ships with varying lengths)
+    const shipLengths = [5, 4, 3, 3, 2];
 
-        if (result.includes("Game Over")) {
-          setGameStatus(result);
-        } else {
-          setIsPlayerTurn(true);
+    // Handle player ship placement
+    const handlePlaceShip = (row, col) => {
+        if (playerShipsPlaced >= shipLengths.length || gameStarted) return; // if the game is started you cannot place your ships 
+
+        const length = shipLengths[playerShipsPlaced];
+        const result = playerBoard.placeShip(length, [row, col], selectedDirection);
+
+        if (result !== "Error: Ship overlap detected!") {
+            setPlayerShipsPlaced(playerShipsPlaced + 1);
+            setPlayerBoard({ ...playerBoard });
         }
-      }, 1000);
-    }
-  }, [isPlayerTurn]);
+    };
 
-  const handleAttack = (row, col) => {
-    if (!isPlayerTurn || gameStatus !== "Game in progress...") return;
+    // Automatically place computer's ships
+    useEffect(() => {
+        computerBoard.placeRandomShips();
+        setComputerBoard({ ...computerBoard });
+    }, []);
 
-    const result = player.attack([row, col], computerBoard);
-    if (result.includes("You won")) {
-      setGameStatus(result);
-    } else if (result !== "already attacked") {
-      setComputerBoard({ ...computerBoard });
-      setIsPlayerTurn(false);
-    }
-  };
+    // Start the game only when the player has placed all ships
+    const startGame = () => {
+        if (playerShipsPlaced === shipLengths.length) {
+            setGameStarted(true);
+        }
+    };
 
-  const renderBoard = (board, isEnemy) => (
-    <div className="game-board" style={{ display: 'grid', gridTemplateColumns: `repeat(${gridSize}, 30px)`, gap: '2px' }}>
-      {Array.from({ length: gridSize }, (_, row) =>
-        Array.from({ length: gridSize }, (_, col) => {
-          const coordStr = `${row},${col}`;
-          const isHit = board.ships.some(ship => ship.hits.has(coordStr));
-          const isMiss = board.missedShots.has(coordStr);
-
-          return (
-            <div
-              key={coordStr}
-              className="square"
-              onClick={isEnemy ? () => handleAttack(row, col) : undefined}
-              style={{
-                width: '30px',
-                height: '30px',
-                border: '1px solid #ccc',
-                backgroundColor: isHit ? 'red' : isMiss ? 'blue' : 'white',
-                cursor: isEnemy ? 'pointer' : 'default',
-              }}
-            />
-          );
-        })
-      )}
-    </div>
-  );
-
-  return (
-    <div>
-      <h2>Battleship Game</h2>
-      <div style={{ display: 'flex', gap: '50px' }}>
+    return (
         <div>
-          <h3>Your Board</h3>
-          {renderBoard(playerBoard, false)}
+            <h2>Place Your Ships</h2>
+            <div>
+                <button onClick={() => setSelectedDirection("horizontal")}>Horizontal</button>
+                <button onClick={() => setSelectedDirection("vertical")}>Vertical</button>
+            </div>
+
+            {/* Player's Board */}
+            <div className="board">
+                {Array.from({ length: 10 }, (_, row) => (
+                    <div key={row} className="row">
+                        {Array.from({ length: 10 }, (_, col) => (
+                            <div
+                                key={col}
+                                className="cell"
+                                onClick={() => handlePlaceShip(row, col)}
+                            >
+                                {/* Display ships (Optional UI enhancement) */}
+                                {playerBoard.ships.some(ship =>
+                                    ship.position.some(([r, c]) => r === row && c === col)
+                                ) ? "🚢" : ""}
+                            </div>
+                        ))}
+                    </div>
+                ))}
+            </div>
+
+            {/* Start game button */}
+            <button onClick={startGame} disabled={playerShipsPlaced < shipLengths.length}>
+                Start Game
+            </button>
+
+            {gameStarted && <h3>Game has started! Time to attack!</h3>}
         </div>
-        <div>
-          <h3>Enemy Board</h3>
-          {renderBoard(computerBoard, true)}
-        </div>
-      </div>
-      <p>{gameStatus}</p>
-    </div>
-  );
+    );
 };
 
 export default GameBoard;

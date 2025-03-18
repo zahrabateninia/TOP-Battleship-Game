@@ -1,6 +1,6 @@
-// this module manages ship placement, attacks, and game state. 
+// This module manages ship placement, attacks, and game state.
+const Ship = require("./ship");
 
-const Ship= require('./ship');
 class Gameboard {
   constructor() {
     this.ships = [];
@@ -19,11 +19,13 @@ class Gameboard {
     }
 
     // Prevent ship overlap
-    if (this.ships.some(ship => 
-      ship.position.some(pos => 
-        position.some(newPos => newPos[0] === pos[0] && newPos[1] === pos[1])
+    if (
+      this.ships.some((ship) =>
+        ship.position.some((pos) =>
+          position.some((newPos) => newPos[0] === pos[0] && newPos[1] === pos[1])
+        )
       )
-    )) {
+    ) {
       return "Error: Ship overlap detected!";
     }
 
@@ -31,10 +33,25 @@ class Gameboard {
     this.ships.push(ship);
   }
 
+  // ✅ NEW: Function to randomly place ships
+  placeRandomShips() {
+    const shipLengths = [5, 4, 3, 3, 2]; // Standard Battleship ship sizes
+    let placedShips = 0;
+
+    while (placedShips < shipLengths.length) {
+      let row = Math.floor(Math.random() * 10);
+      let col = Math.floor(Math.random() * 10);
+      let direction = Math.random() > 0.5 ? "horizontal" : "vertical";
+
+      if (this.placeShip(shipLengths[placedShips], [row, col], direction) !== "Error: Ship overlap detected!") {
+        placedShips++;
+      }
+    }
+  }
+
   receiveAttack(coord) {
     for (let ship of this.ships) {
       if (ship.hit(coord)) {
-        // Check victory after a successful hit
         if (this.checkVictory()) {
           return "You won! All ships have been sunk.";
         }
@@ -42,21 +59,17 @@ class Gameboard {
       }
     }
 
-    this.missedShots.add(coord.join(',')); 
-    // Check if player lost after every attack
+    this.missedShots.add(coord.join(","));
     if (this.checkVictory()) {
       return "Game Over! You lost.";
     }
     return "miss";
   }
 
-  // Function to check if all ships are sunk
   checkVictory() {
-    // Check if all ships are sunk (no hits left on any ship)
-    return this.ships.every(ship => ship.isSunk());
+    return this.ships.every((ship) => ship.isSunk());
   }
 
-  // Function to reset the game for a new round
   resetGame() {
     this.ships = [];
     this.missedShots = new Set();
