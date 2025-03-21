@@ -33,7 +33,6 @@ class Gameboard {
     this.ships.push(ship);
   }
 
-  // ✅ NEW: Function to randomly place ships
   placeRandomShips() {
     const shipLengths = [5, 4, 3, 3, 2]; // Standard Battleship ship sizes
     let placedShips = 0;
