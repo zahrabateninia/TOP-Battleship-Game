@@ -1,62 +1,57 @@
-// coordinates the full game logic, handling turns and checking for a winner.
-
 const Gameboard = require("./gameboard");
-const Player = require("./player");
 
 class Game {
   constructor() {
-    this.player = new Player(false);
-    this.computer = new Player(true);
     this.playerBoard = new Gameboard();
     this.computerBoard = new Gameboard();
-    
-    this.currentTurn = this.player; // Start with player
+    this.isPlayerTurn = true;
   }
 
-  // Player attack method
+  setupPlayerShips(shipPlacements) {
+    for (const { name, startCoord, direction } of shipPlacements) {
+      const result = this.playerBoard.placeShip(name, startCoord, direction);
+      if (result?.startsWith("Error")) {
+        return result; // Return error message if ship placement fails
+      }
+    }
+  }
+
+  setupComputerShips() {
+    this.computerBoard.placeRandomShips();
+  }
+
   playerAttack(coord) {
-    if (this.currentTurn !== this.player) return "Not your turn!";
-    
-    const result = this.player.attack(coord, this.computerBoard);
-    if (result !== "already attacked") {
-      this.switchTurn();
-    }
+    if (!this.isPlayerTurn) return "Wait for your turn!";
+    const result = this.computerBoard.receiveAttack(coord);
+    if (result !== "hit") this.isPlayerTurn = false;
     return result;
   }
 
-  // Computer attack method
   computerAttack() {
-    if (this.currentTurn !== this.computer) return "Not computer's turn!";
-    
-    const result = this.computer.computerAttack(this.playerBoard);
-    this.switchTurn();
+    if (this.isPlayerTurn) return "Wait for your turn!";
+
+    let row, col, coord;
+    do {
+      row = Math.floor(Math.random() * 10);
+      col = Math.floor(Math.random() * 10);
+      coord = [row, col];
+    } while (this.playerBoard.missedShots.has(coord.join(",")));
+
+    const result = this.playerBoard.receiveAttack(coord);
+    this.isPlayerTurn = true; // Switch back to player
     return result;
   }
 
-  // Check if the game is over
-  checkGameOver() {
-    if (this.computerBoard.checkVictory()) {
-      return "You won! All computer ships have been sunk.";
-    }
-    if (this.playerBoard.checkVictory()) {
-      return "Game Over! You lost.";
-    }
+  checkWinner() {
+    if (this.playerBoard.checkVictory()) return "Computer Wins!";
+    if (this.computerBoard.checkVictory()) return "Player Wins!";
     return null;
   }
 
-  // Switch turns
-  switchTurn() {
-    this.currentTurn = this.currentTurn === this.player ? this.computer : this.player;
-    this.currentTurn.startTurn();
-  }
-
-  // Reset game for a new round
   resetGame() {
     this.playerBoard.resetGame();
     this.computerBoard.resetGame();
-    this.player.attackedCoordinates.clear();
-    this.computer.attackedCoordinates.clear();
-    this.currentTurn = this.player; // Player starts
+    this.isPlayerTurn = true;
   }
 }
 
