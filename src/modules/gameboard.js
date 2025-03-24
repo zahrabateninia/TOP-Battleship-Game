@@ -1,4 +1,3 @@
-// This module manages ship placement, attacks, and game state.
 const Ship = require("./ship");
 
 class Gameboard {
@@ -7,10 +6,10 @@ class Gameboard {
     this.missedShots = new Set(); // Set to track missed shots
   }
 
-  placeShip(length, startCoord, direction) {
+  placeShip(ship, startCoord, direction) {
     let position = [];
 
-    for (let i = 0; i < length; i++) {
+    for (let i = 0; i < ship.length; i++) {
       if (direction === "horizontal") {
         position.push([startCoord[0], startCoord[1] + i]);
       } else if (direction === "vertical") {
@@ -20,8 +19,8 @@ class Gameboard {
 
     // Prevent ship overlap
     if (
-      this.ships.some((ship) =>
-        ship.position.some((pos) =>
+      this.ships.some((existingShip) =>
+        existingShip.position.some((pos) =>
           position.some((newPos) => newPos[0] === pos[0] && newPos[1] === pos[1])
         )
       )
@@ -29,20 +28,19 @@ class Gameboard {
       return "Error: Ship overlap detected!";
     }
 
-    const ship = new Ship(length, position);
-    this.ships.push(ship);
+    const newShip = new Ship(ship.name, ship.length, position);
+    this.ships.push(newShip);
   }
 
-  placeRandomShips() {
-    const shipLengths = [5, 4, 3, 3, 2]; // Standard Battleship ship sizes
+  placeRandomShips(ships) {
     let placedShips = 0;
 
-    while (placedShips < shipLengths.length) {
+    while (placedShips < ships.length) {
       let row = Math.floor(Math.random() * 10);
       let col = Math.floor(Math.random() * 10);
       let direction = Math.random() > 0.5 ? "horizontal" : "vertical";
 
-      if (this.placeShip(shipLengths[placedShips], [row, col], direction) !== "Error: Ship overlap detected!") {
+      if (this.placeShip(ships[placedShips], [row, col], direction) !== "Error: Ship overlap detected!") {
         placedShips++;
       }
     }
