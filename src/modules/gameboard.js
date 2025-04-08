@@ -10,6 +10,7 @@ const ships = [
 
 class Gameboard {
   constructor() {
+    this.board = Array.from({ length: 10 }, () => Array(10).fill(null));  
     this.ships = [];
     this.missedShots = new Set(); // Set to track missed shots
   }
@@ -82,6 +83,7 @@ class Gameboard {
   }
 
   resetGame() {
+    this.board = Array.from({ length: 10 }, () => Array(10).fill(null));  
     this.ships = [];
     this.missedShots = new Set();
   }

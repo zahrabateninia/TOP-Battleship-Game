@@ -66,7 +66,7 @@ const ShipPlacement = ({ onStartGame }) => {
 
   const handleStartGame = () => {
     if (shipsUsed.length === 5) {
-      onStartGame(board);
+      onStartGame(board); // Call onStartGame with the player's board when starting the game
     } else {
       alert("Please place all 5 ships before starting the game!");
     }
