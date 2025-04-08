@@ -66,11 +66,16 @@ const ShipPlacement = ({ onStartGame }) => {
 
   const handleStartGame = () => {
     if (shipsUsed.length === 5) {
-      onStartGame(board); // Call onStartGame with the player's board when starting the game
+      const structuredShips = shipPositions.map((positions, idx) => ({
+        name: shipsUsed[idx],
+        position: positions,
+      }));
+      onStartGame(structuredShips); // Send ship info to the game
     } else {
       alert("Please place all 5 ships before starting the game!");
     }
   };
+  
 
   return (
     <div className="app-container">
