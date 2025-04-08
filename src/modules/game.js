@@ -8,14 +8,6 @@ class Game {
     this.isPlayerTurn = true;
   }
 
-  // setupPlayerShips(shipPlacements) {
-  //   for (const { name, startCoord, direction } of shipPlacements) {
-  //     const result = this.playerBoard.placeShip(name, startCoord, direction);
-  //     if (result?.startsWith("Error")) {
-  //       return result; // Return error message if ship placement fails
-  //     }
-  //   }
-  // }
 
   setupPlayerShips(shipsArray) {
     for (const ship of shipsArray) {
@@ -23,9 +15,13 @@ class Game {
       this.playerBoard.ships.push(newShip);
   
       // Mark the board so it can be rendered
-      for (const [row, col] of ship.position) {
+      // for (const [row, col] of ship.position) {
+      //   this.playerBoard.board[row][col] = true;
+      // }
+      for (const [col, row] of ship.position) {
         this.playerBoard.board[row][col] = true;
       }
+      
     }
   }
   

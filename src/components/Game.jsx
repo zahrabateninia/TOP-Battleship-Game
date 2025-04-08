@@ -5,10 +5,6 @@ const BattleshipGame  = ({ playerBoard }) => {
   const [game, setGame] = useState(null);
   const [winner, setWinner] = useState(null);
 
-//   console.log("Game object:", game);
-//   console.log("Player board:", game?.playerBoard?.board);
-//   console.log("Computer board:", game?.computerBoard?.board);
-
 
   useEffect(() => {
     if (playerBoard) {
@@ -48,7 +44,6 @@ const BattleshipGame  = ({ playerBoard }) => {
       </div>
     ));
   };
-  
   
   
   
