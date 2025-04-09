@@ -5,21 +5,24 @@ const BattleshipGame = ({ playerBoard }) => {
   const [game, setGame] = useState(null);
   const [winner, setWinner] = useState(null);
   const [attackedCoords, setAttackedCoords] = useState(new Set());
+  const [isPlayerTurn, setIsPlayerTurn] = useState(true); // Track whose turn it is
+  const [message, setMessage] = useState("Your turn!"); // Message to show whose turn it is
 
   useEffect(() => {
     if (playerBoard) {
       const newGame = new Game();
       newGame.setupPlayerShips(playerBoard);
-      newGame.setupComputerShips(); // Places random ships for computer
+      newGame.setupComputerShips(); // Places random ships for the computer
       setGame(newGame);
     }
   }, [playerBoard]);
 
+  // Handle player's attack
   const handlePlayerAttack = (coord) => {
-    if (!game || winner) return;
+    if (!game || winner || !isPlayerTurn) return; // Prevent attack if it's not player's turn
 
     const coordKey = coord.join(",");
-    if (attackedCoords.has(coordKey)) return; // Don't attack same cell twice
+    if (attackedCoords.has(coordKey)) return; // Don't attack the same cell twice
 
     const result = game.playerAttack(coord);
     setAttackedCoords((prev) => new Set(prev).add(coordKey));
@@ -28,10 +31,50 @@ const BattleshipGame = ({ playerBoard }) => {
       const currentWinner = game.checkWinner();
       if (currentWinner) {
         setWinner(currentWinner);
+        setMessage(`${currentWinner} wins!`);
       }
     }
+
+    setIsPlayerTurn(false); // Switch turn to computer
+    setMessage("Computer's turn..."); // Set message to computer's turn
   };
 
+  // Handle computer's attack
+  const handleComputerAttack = () => {
+    if (isPlayerTurn || !game) return; // If it's the player's turn, don't let the computer attack
+
+    let row, col, coord;
+    do {
+      row = Math.floor(Math.random() * 10);
+      col = Math.floor(Math.random() * 10);
+      coord = [row, col];
+    } while (attackedCoords.has(coord.join(","))); // Ensure no repeated attacks
+
+    const result = game.computerAttack(coord);
+    setAttackedCoords((prev) => new Set(prev).add(coord.join(",")));
+
+    if (result) {
+      const currentWinner = game.checkWinner();
+      if (currentWinner) {
+        setWinner(currentWinner);
+        setMessage(`${currentWinner} wins!`);
+      }
+    }
+
+    setIsPlayerTurn(true); // Switch turn back to player
+    setMessage("Your turn!"); // Set message to player's turn
+  };
+
+  useEffect(() => {
+    // Trigger the computer's attack after player's attack
+    if (!isPlayerTurn) {
+      setTimeout(() => {
+        handleComputerAttack();
+      }, 1000); // Add delay to simulate computer's thinking time
+    }
+  }, [isPlayerTurn]); // Trigger computer attack when it's computer's turn
+
+  // Render the board for both the player and the computer
   const renderBoard = (board, isComputer = false) => {
     if (!board) return null;
 
@@ -48,7 +91,6 @@ const BattleshipGame = ({ playerBoard }) => {
             isAttacked && isComputer && !hasShip ? "miss-cell" : "", // Show miss on computer
           ].join(" ");
 
-          
           return (
             <div
               key={coordKey}
@@ -77,7 +119,8 @@ const BattleshipGame = ({ playerBoard }) => {
           </div>
         </div>
       </div>
-      {winner && <h2>{winner}</h2>}
+      {message && <h2>{message}</h2>} {/* Show current game message */}
+      {winner && <h2>{winner}</h2>} {/* Display winner when the game ends */}
     </div>
   );
 };
