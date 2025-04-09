@@ -1,52 +1,65 @@
 import React, { useState, useEffect } from "react";
-import Game from "../modules/game"
+import Game from "../modules/game";
 
-const BattleshipGame  = ({ playerBoard }) => {
+const BattleshipGame = ({ playerBoard }) => {
   const [game, setGame] = useState(null);
   const [winner, setWinner] = useState(null);
-
+  const [attackedCoords, setAttackedCoords] = useState(new Set());
 
   useEffect(() => {
     if (playerBoard) {
-      const newGame = new Game();  // Initialize game
-      newGame.setupPlayerShips(playerBoard);  // Set up player's ships
-      newGame.setupComputerShips();  // Set up computer's ships randomly
+      const newGame = new Game();
+      newGame.setupPlayerShips(playerBoard);
+      newGame.setupComputerShips(); // Places random ships for computer
       setGame(newGame);
     }
   }, [playerBoard]);
 
-  // Handle attacks and check for winner
   const handlePlayerAttack = (coord) => {
-    if (game) {
-      const result = game.playerAttack(coord);
-      if (result) {
-        const winner = game.checkWinner();
-        if (winner) {
-          setWinner(winner);
-        }
+    if (!game || winner) return;
+
+    const coordKey = coord.join(",");
+    if (attackedCoords.has(coordKey)) return; // Don't attack same cell twice
+
+    const result = game.playerAttack(coord);
+    setAttackedCoords((prev) => new Set(prev).add(coordKey));
+
+    if (result) {
+      const currentWinner = game.checkWinner();
+      if (currentWinner) {
+        setWinner(currentWinner);
       }
     }
   };
 
-  // Render the board for a given player (player or computer)
-  const renderBoard = (board) => {
-    if (!board) return null;  // Return null if the board is not available
-  
+  const renderBoard = (board, isComputer = false) => {
+    if (!board) return null;
+
     return board.map((row, rowIndex) => (
       <div key={rowIndex} className="board-row">
-        {row.map((cell, colIndex) => (
-          <div
-            key={`${rowIndex}-${colIndex}`}
-            className={`cell ${cell ? 'ship-cell' : ''}`}  // Apply 'ship-cell' class if the cell has a ship
-            onClick={() => handlePlayerAttack([rowIndex, colIndex])}
-          />
-        ))}
+        {row.map((cell, colIndex) => {
+          const coordKey = `${rowIndex},${colIndex}`;
+          const isAttacked = attackedCoords.has(coordKey);
+          const hasShip = cell !== null;
+          const cellClass = [
+            "cell",
+            hasShip && !isComputer ? "ship-cell" : "", // Show player ships
+            isAttacked && isComputer && hasShip ? "hit-cell" : "", // Show hit on computer
+            isAttacked && isComputer && !hasShip ? "miss-cell" : "", // Show miss on computer
+          ].join(" ");
+
+          
+          return (
+            <div
+              key={coordKey}
+              className={cellClass}
+              onClick={() => isComputer && handlePlayerAttack([rowIndex, colIndex])}
+            />
+          );
+        })}
       </div>
     ));
   };
-  
-  
-  
 
   return (
     <div className="app-container">
@@ -54,24 +67,19 @@ const BattleshipGame  = ({ playerBoard }) => {
         <div>
           <h3>Player's Board</h3>
           <div className="board">
-            {/* {game && renderBoard(game.playerBoard.board)} */}
             {game?.playerBoard?.board && renderBoard(game.playerBoard.board)}
-
           </div>
         </div>
         <div>
           <h3>Computer's Board</h3>
           <div className="board">
-            {/* {game && renderBoard(game.computerBoard.board)} */}
-            {game?.computerBoard?.board && renderBoard(game.computerBoard.board)}
-
+            {game?.computerBoard?.board && renderBoard(game.computerBoard.board, true)}
           </div>
         </div>
       </div>
       {winner && <h2>{winner}</h2>}
     </div>
   );
-  
 };
 
 export default BattleshipGame;

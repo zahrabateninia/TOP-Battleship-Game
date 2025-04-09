@@ -19,14 +19,22 @@ class Gameboard {
     const shipData = ships.find(s => s.name === shipName);
     if (!shipData) return "Error: Invalid ship name!";
 
-    let position = [];
+    const position = [];
 
     for (let i = 0; i < shipData.length; i++) {
+      let row = startCoord[0];
+      let col = startCoord[1];
+
       if (direction === "horizontal") {
-        position.push([startCoord[0], startCoord[1] + i]);
+        col += i;
       } else if (direction === "vertical") {
-        position.push([startCoord[0] + i, startCoord[1]]);
+        row += i;
       }
+
+      // Check if out of bounds
+      if (row >= 10 || col >= 10) return "Error: Ship goes out of bounds!";
+
+      position.push([row, col]);
     }
 
     // Prevent ship overlap
@@ -42,40 +50,42 @@ class Gameboard {
 
     const ship = new Ship(shipData.name, shipData.length, position);
     this.ships.push(ship);
+
+    // Mark the ship on the board
+    for (const [row, col] of position) {
+      this.board[row][col] = true;
+    }
+
+    return "ok";
   }
 
   placeRandomShips() {
-    const availableShips = [...ships]; // Copy ship list to prevent modification
+    const availableShips = [...ships];
 
-    while (availableShips.length > 0) {
-      const randomIndex = Math.floor(Math.random() * availableShips.length);
-      const shipData = availableShips.splice(randomIndex, 1)[0]; // Remove selected ship
+    for (const shipData of availableShips) {
+      let placed = false;
 
-      let row, col, direction, validPlacement;
-      do {
-        row = Math.floor(Math.random() * 10);
-        col = Math.floor(Math.random() * 10);
-        direction = Math.random() > 0.5 ? "horizontal" : "vertical";
-        validPlacement = this.placeShip(shipData.name, [row, col], direction);
-      } while (validPlacement === "Error: Ship overlap detected!");
+      while (!placed) {
+        const row = Math.floor(Math.random() * 10);
+        const col = Math.floor(Math.random() * 10);
+        const direction = Math.random() > 0.5 ? "horizontal" : "vertical";
+        const result = this.placeShip(shipData.name, [row, col], direction);
+        if (result === "ok") {
+          placed = true;
+        }
+      }
     }
   }
 
   receiveAttack(coord) {
     for (let ship of this.ships) {
       if (ship.hit(coord)) {
-        if (this.checkVictory()) {
-          return "You won! All ships have been sunk.";
-        }
-        return "hit";
+        return this.checkVictory() ? "You won! All ships have been sunk." : "hit";
       }
     }
 
     this.missedShots.add(coord.join(","));
-    if (this.checkVictory()) {
-      return "Game Over! You lost.";
-    }
-    return "miss";
+    return this.checkVictory() ? "Game Over! You lost." : "miss";
   }
 
   checkVictory() {
