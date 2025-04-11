@@ -76,17 +76,22 @@ class Gameboard {
       }
     }
   }
-
-  receiveAttack(coord) {
+  receiveAttack(coord, label = "Unknown") {
+    console.log(`🔔 Receiving attack on ${label} board at:`, coord);
+    console.log(`🛳️ Ships on ${label} board:`, this.ships);
+  
     for (let ship of this.ships) {
       if (ship.hit(coord)) {
+        console.log("💥 HIT!");
         return this.checkVictory() ? "You won! All ships have been sunk." : "hit";
       }
     }
-
+  
     this.missedShots.add(coord.join(","));
+    console.log("💨 MISS!");
     return this.checkVictory() ? "Game Over! You lost." : "miss";
   }
+  
 
   checkVictory() {
     return this.ships.every((ship) => ship.isSunk());
@@ -97,6 +102,7 @@ class Gameboard {
     this.ships = [];
     this.missedShots = new Set();
   }
+  
 }
 
 module.exports = Gameboard;
