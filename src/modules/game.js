@@ -58,12 +58,13 @@ class Game {
     if (this.computerBoard.checkVictory()) return "Player Wins!";
     return null;
   }
-
   resetGame() {
-    this.playerBoard.resetGame();
-    this.computerBoard.resetGame();
+    this.playerBoard.restartGame();
+    this.computerBoard.restartGame();
     this.isPlayerTurn = true;
   }
+  
+
 }
 
 module.exports = Game;

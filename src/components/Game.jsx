@@ -4,17 +4,27 @@ import Game from "../modules/game";
 const BattleshipGame = ({ playerBoard }) => {
   const [game, setGame] = useState(null);
   const [winner, setWinner] = useState(null);
-  const [playerAttacks, setPlayerAttacks] = useState(new Set()); // player -> computer
-  const [computerAttacks, setComputerAttacks] = useState(new Set()); // computer -> player
+  const [playerAttacks, setPlayerAttacks] = useState(new Set());
+  const [computerAttacks, setComputerAttacks] = useState(new Set());
   const [isPlayerTurn, setIsPlayerTurn] = useState(true);
   const [message, setMessage] = useState("Your turn!");
 
+  const initializeGame = () => {
+    const newGame = new Game();
+    newGame.setupPlayerShips(playerBoard);
+    newGame.setupComputerShips();
+
+    setGame(newGame);
+    setPlayerAttacks(new Set());
+    setComputerAttacks(new Set());
+    setWinner(null);
+    setIsPlayerTurn(true);
+    setMessage("Your turn!");
+  };
+
   useEffect(() => {
     if (playerBoard) {
-      const newGame = new Game();
-      newGame.setupPlayerShips(playerBoard);
-      newGame.setupComputerShips();
-      setGame(newGame);
+      initializeGame();
     }
   }, [playerBoard]);
 
@@ -27,13 +37,11 @@ const BattleshipGame = ({ playerBoard }) => {
     const result = game.playerAttack(coord);
     setPlayerAttacks((prev) => new Set(prev).add(coordKey));
 
-    if (result) {
-      const currentWinner = game.checkWinner();
-      if (currentWinner) {
-        setWinner(currentWinner);
-        setMessage(currentWinner);
-        return;
-      }
+    const currentWinner = game.checkWinner();
+    if (currentWinner) {
+      setWinner(currentWinner);
+      setMessage(currentWinner);
+      return;
     }
 
     setIsPlayerTurn(false);
@@ -54,13 +62,11 @@ const BattleshipGame = ({ playerBoard }) => {
     const result = game.computerAttack(coord);
     setComputerAttacks((prev) => new Set(prev).add(coordKey));
 
-    if (result) {
-      const currentWinner = game.checkWinner();
-      if (currentWinner) {
-        setWinner(currentWinner);
-        setMessage(currentWinner);
-        return;
-      }
+    const currentWinner = game.checkWinner();
+    if (currentWinner) {
+      setWinner(currentWinner);
+      setMessage(currentWinner);
+      return;
     }
 
     setIsPlayerTurn(true);
@@ -120,6 +126,9 @@ const BattleshipGame = ({ playerBoard }) => {
           </div>
         </div>
       </div>
+      <button onClick={initializeGame} className="restart-button">
+        Restart Game
+      </button>
       <h1>{message}</h1>
     </div>
   );

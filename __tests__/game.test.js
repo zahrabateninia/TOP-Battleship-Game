@@ -42,7 +42,7 @@ describe("Game", () => {
   });
 
   test("game resets properly", () => {
-    game.resetGame();
+    game.restartGame();
 
     expect(game.playerBoard.ships.length).toBe(0);
     expect(game.computerBoard.ships.length).toBe(0);
