@@ -44,7 +44,7 @@
   
   
   .hit-cell {
-    background-color: red;
+    background-color: rgb(144, 46, 46);
   }
   
   .miss-cell {
@@ -58,6 +58,9 @@
     color: white;
   }
   
+  .cell.ship-cell.hit-cell {
+    background-color: rgb(202, 76, 76);
+  }
   /* Ship button styles */
   .ship-button {
     margin: 5px;
