@@ -44,7 +44,7 @@
   
   
   .hit-cell {
-    background-color: rgb(144, 46, 46);
+    background-color:  rgb(202, 76, 76);
   }
   
   .miss-cell {
@@ -96,3 +96,6 @@
     cursor: not-allowed;
   }
   
+  h3{
+    margin-bottom: 1rem;
+  }

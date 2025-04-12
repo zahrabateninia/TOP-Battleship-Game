@@ -31,7 +31,7 @@ const BattleshipGame = ({ playerBoard }) => {
       const currentWinner = game.checkWinner();
       if (currentWinner) {
         setWinner(currentWinner);
-        setMessage(`${currentWinner} wins!`);
+        setMessage(currentWinner);
         return;
       }
     }
@@ -58,7 +58,7 @@ const BattleshipGame = ({ playerBoard }) => {
       const currentWinner = game.checkWinner();
       if (currentWinner) {
         setWinner(currentWinner);
-        setMessage(`${currentWinner} wins!`);
+        setMessage(currentWinner);
         return;
       }
     }
@@ -120,8 +120,7 @@ const BattleshipGame = ({ playerBoard }) => {
           </div>
         </div>
       </div>
-      {winner && <h2>{winner}</h2>}
-      <h3>{message}</h3>
+      <h1>{message}</h1>
     </div>
   );
 };
