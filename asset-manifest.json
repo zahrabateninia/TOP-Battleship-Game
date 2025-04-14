@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/TOP-Battleship-Game/static/css/main.c8af1f05.css",
+    "main.js": "/TOP-Battleship-Game/static/js/main.39e95e73.js",
+    "index.html": "/TOP-Battleship-Game/index.html",
+    "main.c8af1f05.css.map": "/TOP-Battleship-Game/static/css/main.c8af1f05.css.map",
+    "main.39e95e73.js.map": "/TOP-Battleship-Game/static/js/main.39e95e73.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.c8af1f05.css",
+    "static/js/main.39e95e73.js"
+  ]
+}
