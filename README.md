@@ -1,28 +1,26 @@
-# TOP Advanced JavaScript Course: Battleship Project
+# 🛳️ TOP Battleship Game
 
-A browser-based Battleship game built with React, inspired by [The Odin Project](https://www.theodinproject.com/) curriculum. This project emphasizes Test-Driven Development (TDD), modular JavaScript, and game logic implementation.
+A classic Battleship game built with React as part of [The Odin Project](https://www.theodinproject.com/) curriculum.
 
----
-
-## 🕹️ Features
-
-- 🔁 Turn-based player vs computer
-- ⚓ Smart ship placement logic
-- 🎯 Hit/miss mechanics
-- 💣 Victory detection
-- ✅ Jest-based testing for core logic
+### Live Demo  
+ [Play it on GitHub Pages](https://zahrabateninia.github.io/TOP-Battleship-Game/)
 
 ---
 
-## 🧪 Tech Stack
+## Features
 
-- ⚛ React
-- 🧪 Jest for testing
-- 🔧 Vite (for fast development and builds)
-- 🌐 GitHub Pages (for deployment)
+- Classic Battleship gameplay: sink all enemy ships to win!
+- Intelligent game state management with React
+- Computer opponent with random ship placement and attacks
+- Custom game logic using JavaScript classes
 
 ---
 
-## 🚀 Live Demo
+## Built With
 
-👉 [Play the Game](https://zahrabateninia.github.io/TOP-Battleship-Game/)
+- React (Create React App)
+- JavaScript (ES6)
+- HTML5 & CSS3
+- Jest (for unit testing)
+
+
